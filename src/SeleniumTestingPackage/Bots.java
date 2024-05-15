@@ -3,6 +3,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -33,7 +34,7 @@ public class Bots {
 	public static int numberOfBots = 60;
 	public static int secondsToLive = 15;
 	public static int gameId = 00000;
-	public static int numberOfDrivers = 10;
+	public static int numberOfDrivers = 7;
 	static final ImmutableMap<String, Thread> THREADS = ImmutableMap.of("blooketBotter", blooketThread, "gimkitBotter", gimkitThread, "kahootBotter", kahootThread);
 	
 	public static Thread stringToThread(String input) {
@@ -87,17 +88,24 @@ public class Bots {
 		for (WebDriver driver : drivers) {
             threads.add(new Thread(() -> {
                 try {
-                    JavascriptExecutor js = (JavascriptExecutor) driver;
-                    js.executeScript("window.open('https://kahoot.it/?pin=" + gameId + "&refer_method=link','_blank');");
-                    Thread.sleep(250);
-                    String newWindowHandle = driver.getWindowHandles().toArray()[1].toString();
-                    driver.switchTo().window(newWindowHandle);
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                    wait.until(ExpectedConditions.urlContains("join"));
-                    WebElement gameUsernameElement = wait.until(ExpectedConditions.elementToBeClickable(By.id("nickname")));
-                    gameUsernameElement.sendKeys(randomName(6));
-                    WebElement gameUsernameClick = driver.findElement(By.cssSelector(".nickname-form__SubmitButton-sc-1mjq176-1"));
-                    gameUsernameClick.click();
+                	for (int i = 0; i < botsPerDriver; i++) {
+                        JavascriptExecutor js = (JavascriptExecutor) driver;
+                        js.executeScript("window.open('https://kahoot.it/?pin=" + gameId + "&refer_method=link','_blank');");
+                        String newWindowHandle = driver.getWindowHandles().toArray()[driver.getWindowHandles().toArray().length-1].toString();
+                        driver.switchTo().window(newWindowHandle);
+                        WebDriverWait wait = null;
+                        try {
+                        	wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                        	wait.until(ExpectedConditions.urlContains("join"));
+                        }
+                        catch(TimeoutException e) {
+                        	e.printStackTrace();
+                        }
+                        WebElement gameUsernameElement = wait.until(ExpectedConditions.elementToBeClickable(By.id("nickname")));
+                        gameUsernameElement.sendKeys(randomName(6));
+                        WebElement gameUsernameClick = driver.findElement(By.cssSelector(".nickname-form__SubmitButton-sc-1mjq176-1"));
+                        gameUsernameClick.click();	
+                	}
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

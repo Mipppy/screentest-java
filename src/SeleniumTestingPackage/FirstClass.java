@@ -24,35 +24,36 @@ public class FirstClass {
 //	     driver.navigate().to("http://www.google.com/");  
 //	     driver.quit();
 		new Updater();
-		Bots bot = new Bots();
-		while (!currentTasks.isEmpty()) {
-			List<String> successfulTasks = new ArrayList<>();
-			List<Thread> usedThreads = new ArrayList<>();
-			for (String task : currentTasks) {
-				Thread th = bot.stringToThread(task);
-				if (th != null) {
-					th.start();
-					successfulTasks.add(task);
-					usedThreads.add(th);
-				}
-			}
-			
-			for (Thread thread : bot.botThreads) {
-				boolean found = false;
-				for (Thread threaded : usedThreads) {
-					if (threaded.toString() == thread.toString()) {
-						found = true;
-					}
-				}
-				if (!found) {
-					try {
-						thread.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
+		SmartBot bot = new SmartBot(7325412);
+		bot.smartBotThread.start();
+//		while (!currentTasks.isEmpty()) {
+//			List<String> successfulTasks = new ArrayList<>();
+//			List<Thread> usedThreads = new ArrayList<>();
+//			for (String task : currentTasks) {
+//				Thread th = bot.stringToThread(task);
+//				if (th != null) {
+//					th.start();
+//					successfulTasks.add(task);
+//					usedThreads.add(th);
+//				}
+//			}
+//			
+//			for (Thread thread : bot.botThreads) {
+//				boolean found = false;
+//				for (Thread threaded : usedThreads) {
+//					if (threaded.toString() == thread.toString()) {
+//						found = true;
+//					}
+//				}
+//				if (!found) {
+//					try {
+//						thread.wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
 	}
 
 	public static class Updater {
